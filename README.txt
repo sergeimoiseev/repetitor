@@ -204,3 +204,14 @@ git clone --branch=master https://github.com/sergeimoiseev/egrixcalc.git code
 файлы теперь в папке c:\Users\Sergei\Projects\EgrixCalc\code\
 
 настраиваю быстрый слив на Гитхаб
+
+просто установил AutoHotkey и настроил "lll" на логин
+а "ppp" на подстановку пароля к гитхабу - работает
+
+по туториалу flask отредактировал app.py (старый - в app_old.py)
+и еще несколько файлов - получился примитивный блог с одним пользователем.
+отредактировал C:\Users\Sergei\Projects\egrixcalc\passenger_wsgi.py
+работает и локально с flask и на амазоновском сервере 
+(и там локально без passenger, и там на внешнем IP c passanger)
+
+эту папку копирую в dropbox - как выжный этап.
