@@ -1,5 +1,6 @@
 #!/bin/bash
-# update current (code) folder from git
+# update current folder from git
+# should be run with 'sudo bash <update_...sh'
 set -x # echo on
 cd /var/www/egrixcalcapp/egrixcalc
 passenger stop
