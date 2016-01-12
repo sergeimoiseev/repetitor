@@ -6,6 +6,6 @@ passenger stop
 git fetch origin
 git reset --hard origin/master
 cd ..
-chmod -R 777 code/
-cd code/
+chmod -R 777 egrixcalc/
+cd egrixcalc
 passenger start
