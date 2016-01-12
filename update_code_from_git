@@ -1,9 +1,0 @@
-#!/bin/bash
-# update current (code) folder from git
-sudo passenger stop
-sudo git fetch origin
-sudo git reset --hard origin/master
-cd ..
-sudo chmod -R 655 code/
-cd code/
-sudo passenger start
