@@ -7,6 +7,6 @@ passenger stop
 git fetch origin
 git reset --hard origin/master
 cd ..
-chmod -R 777 repetitor/
+chmod -R 777 code/
 cd code
 passenger start
