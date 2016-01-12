@@ -2,28 +2,32 @@
 https://www.phusionpassenger.com/library/walkthroughs/deploy/python/aws/standalone/oss/trusty/deploy_app.html#login-to-your-server-create-a-user-for-the-app
 
 На виртуальной машине пользователь, под которым будет работать программа создан командой
-sudo adduser repetitor
+sudo adduser egrixcalc
 пароль пользователя - 32167
 
 установка SSH key
 
-sudo mkdir -p ~repetitor/.ssh
-sudo sh -c "cat $HOME/.ssh/authorized_keys >> ~repetitor/.ssh/authorized_keys"
-sudo chown -R repetitor: ~repetitor/.ssh
-sudo chmod 700 ~repetitor/.ssh
-sudo sh -c "chmod 600 ~repetitor/.ssh/*"
+sudo mkdir -p ~egrixcalc/.ssh
+sudo sh -c "cat $HOME/.ssh/authorized_keys >> ~egrixcalc/.ssh/authorized_keys"
+sudo chown -R egrixcalc: ~egrixcalc/.ssh
+sudo chmod 700 ~egrixcalc/.ssh
+sudo sh -c "chmod 600 ~egrixcalc/.ssh/*"
 
 установка git-а
 sudo apt-get install -y git
 
 создаем директорию для кода
 
-sudo mkdir -p /var/www/repetitorapp
-sudo chown repetitor: /var/www/repetitorapp
+sudo mkdir -p /var/www/egrixcalcapp
+sudo chown egrixcalc: /var/www/egrixcalcapp
 
-взял код у себя с git-а:
-cd /var/www/repetitorapp
-sudo -u repetitor -H git clone https://github.com/sergeimoiseev/repetitor.git code
+Вот так брать код с git-а:
+cd /var/www/egrixcalcapp
+sudo -u egrixcalc -H git clone git://github.com/username/myapp.git code
+
+приложение-пример взял так:
+cd /var/www/egrixcalcapp
+sudo -u egrixcalc -H git clone --branch=end_result https://github.com/phusion/passenger-python-flask-demo.git code
 
 Your app's code now lives on the server at /var/www/myapp/code
 
@@ -32,24 +36,29 @@ sudo pip install flask
 (пришлось сначала поствить pip через apt-get)
 
 
+Create a Passenger config file
+
+cd /var/www/myapp/code
+sudo nano Passengerfile.json
+
+{
+  // Tell Passenger that this is a Python app.
+  // Replace "passenger_wsgi.py" with your app's WSGI entry point file.
+  "app_type": "wsgi",
+  "startup_file": "passenger_wsgi.py",
+  // Run the app in a production environment. The default value is "development".
+  "environment": "production",
+  // Run Passenger on port 80, the standard HTTP port.
+  "port": 80,
+  // Tell Passenger to daemonize into the background.
+  "daemonize": true,
+  // Tell Passenger to run the app as the given user. Only has effect
+  // if Passenger was started with root privileges.
+  "user": "egrixcalc"
+}
+
 Finally, fix the permissions on the file:
-sudo chown repetitor: Passengerfile.json
-
-# Install our PGP key and add HTTPS support for APT
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7
-sudo apt-get install -y apt-transport-https ca-certificates
-
-# Add our APT repository
-sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main > /etc/apt/sources.list.d/passenger.list'
-sudo apt-get update
-
-sudo passenger-config validate-install
-
-sudo apt-get update
-sudo apt-get upgrade
-
-# Install Passenger
-sudo apt-get install -y passenger
+sudo chown egrixcalc: Passengerfile.json
 
 Start Passenger Standalone
 cd /var/www/myapp/code
@@ -57,13 +66,13 @@ sudo passenger start
 
 
 По адресу 
-http://.............../
+http://54.213.157.107/
 
 теперь видна страничка, сгенерированная моим сервером
 ----
 Deploying application updates
 with Passenger in Standalone mode
-(ssh -i your_ec2_key.pem repetitor@54.213.157.107)
+(ssh -i your_ec2_key.pem egrixcalc@54.213.157.107)
 
 мне придется каждый раз входить через java-приложение в firefox
 и менять пользователя
@@ -80,69 +89,69 @@ passenger-config restart-app $(pwd)
 создаю свой главный репозиторий (рабочий репозиторий буду push-ать в него, а из него уже в git
 а из git-а - на сервер)
 
-Sergei@embedder-pc MINGW64 ~/Dropbox/Work/repetitor
-$ cd repetitor.git/
+Sergei@embedder-pc MINGW64 ~/Dropbox/Work/EgrixCalc
+$ cd egrixcalc.git/
 
-Sergei@embedder-pc MINGW64 ~/Dropbox/Work/repetitor/repetitor.git
+Sergei@embedder-pc MINGW64 ~/Dropbox/Work/EgrixCalc/egrixcalc.git
 $ git --bare init
-Initialized empty Git repository in C:/Users/Sergei/Dropbox/Work/repetitor/repetitor.git/
+Initialized empty Git repository in C:/Users/Sergei/Dropbox/Work/EgrixCalc/egrixcalc.git/
 
 дальше добавляю в репозиторий файлы и использую GitGUI для работы с кодом
 
 на гитхабе сделал репозиторий-обменник
-https://github.com/sergeimoiseev/repetitor.git
+https://github.com/sergeimoiseev/egrixcalc.git
 
 на сервер в папке www code
 создаю репозиторий, чтобы проще было использовать / передавать скрипты и т.д.
 
-repetitor@ip-172-31-25-197:/var/www/repetitorapp/code$ git --bare init                                                          
-Initialized empty Git repository in /var/www/repetitorapp/code/
+egrixcalc@ip-172-31-25-197:/var/www/egrixcalcapp/code$ git --bare init                                                          
+Initialized empty Git repository in /var/www/egrixcalcapp/code/
 
-добавляю новый ремоут - repetitor_github:
-git remote add repetitor_github https://github.com/sergeimoiseev/repetitor.git
+добавляю новый ремоут - egrixcalc_github:
+git remote add egrixcalc_github https://github.com/sergeimoiseev/egrixcalc.git
 
-удалю все из папки repetitorapp
-cd /var/www/repetitorapp
-sudo -u repetitor -H git clone git://github.com/sergeimoiseev/repetitor.git
+удалю все из папки egrixcalcapp
+cd /var/www/egrixcalcapp
+sudo -u egrixcalc -H git clone git://github.com/sergeimoiseev/egrixcalc.git
 
 все заново
 на github создал пустой репозиторий
 
-в c:\Users\Sergei\Projects\repetitor\
+в c:\Users\Sergei\Projects\egrixcalc\
 скопировал пример архивом отсюда https://github.com/phusion/passenger-python-flask-demo
-распаковал в c:\Users\Sergei\Projects\repetitor\
-- там сделал репозиторий, изменения скоммитил, отправил https://github.com/sergeimoiseev/repetitor.git
+распаковал в c:\Users\Sergei\Projects\egrixcalc\
+- там сделал репозиторий, изменения скоммитил, отправил https://github.com/sergeimoiseev/egrixcalc.git
 -успешно
 
 выполнил 
-sudo -u repetitor -H git clone git://github.com/sergeimoiseev/repetitor.git
+sudo -u egrixcalc -H git clone git://github.com/sergeimoiseev/egrixcalc.git
 теперь все в папке
-/var/www/repetitorapp/repetitor/repetitor$ ls
+/var/www/egrixcalcapp/egrixcalc/egrixcalc$ ls
 app.py  LICENSE.md  README.md  templates
-/var/www/repetitorapp/repetitor/repetitor$ ls -a        
+/var/www/egrixcalcapp/egrixcalc/egrixcalc$ ls -a        
 .  ..  app.py  .git  .gitignore  LICENSE.md  README.md  templates
 
 ----
 при каждом обновлении нужно 
 1. удалить весь код
-ubuntu@ip-172-31-25-197:/var/www/repetitorapp$ sudo rm -rf repetitor/
+ubuntu@ip-172-31-25-197:/var/www/egrixcalcapp$ sudo rm -rf egrixcalc/
 2. склонировать новый код с гитхаба
-ubuntu@ip-172-31-25-197:/var/www/repetitorapp/repetitor$ sudo -u repetitor -H git clone git://github.com/sergeimoiseev/repetitor.git
+ubuntu@ip-172-31-25-197:/var/www/egrixcalcapp/egrixcalc$ sudo -u egrixcalc -H git clone git://github.com/sergeimoiseev/egrixcalc.git
 
 получаем:
-ubuntu@ip-172-31-25-197:/var/www/repetitorapp/repetitor$ ls -a
+ubuntu@ip-172-31-25-197:/var/www/egrixcalcapp/egrixcalc$ ls -a
 .  ..  app.py  .git  .gitignore  LICENSE.md  passenger_wsgi.py  README.md  templates
  - все как должно быть
 
 запускаем:
-cd /var/www/repetitorapp/repetitor
+cd /var/www/egrixcalcapp/egrixcalc
 sudo passenger start
 -
 ошибка
-ubuntu@ip-172-31-25-197:/var/www/repetitorapp/repetitor$ sudo passenger start
+ubuntu@ip-172-31-25-197:/var/www/egrixcalcapp/egrixcalc$ sudo passenger start
 =============== Phusion Passenger Standalone web server started ===============
-PID file: /var/www/repetitorapp/repetitor/passenger.3000.pid
-Log file: /var/www/repetitorapp/repetitor/passenger.3000.log
+PID file: /var/www/egrixcalcapp/egrixcalc/passenger.3000.pid
+Log file: /var/www/egrixcalcapp/egrixcalc/passenger.3000.log
 Environment: development
 Accessible via: http://0.0.0.0:3000/
 
@@ -161,7 +170,7 @@ App 5130 stdout:
 -----
 все удалил, заново взял с гитхаба - уже с файлом Passengerfile.json
 поменял права 
-sudo chown repetitor: Passengerfile.json
+sudo chown egrixcalc: Passengerfile.json
 и в папке с кодом запустил
 sudo passenger start
 
@@ -174,7 +183,7 @@ sudo passenger start
 sudo git fetch origin
 sudo git reset --hard origin/master
 
-(ubuntu@ip-172-31-25-197:/var/www/repetitorapp/repetitor$ sudo git reset --hard origin/master                                                                    
+(ubuntu@ip-172-31-25-197:/var/www/egrixcalcapp/egrixcalc$ sudo git reset --hard origin/master                                                                    
 HEAD is now at 8641d6a editing html to test server code updating procedure)
 -получилось вроде бы
 
@@ -182,17 +191,17 @@ HEAD is now at 8641d6a editing html to test server code updating procedure)
 
 sudo passenger-config restart-app $(pwd)
 
-(ubuntu@ip-172-31-25-197:/var/www/repetitorapp/repetitor$ sudo passenger-config restart-app $(pwd)
-Restarting /var/www/repetitorapp/repetitor/public (production))
+(ubuntu@ip-172-31-25-197:/var/www/egrixcalcapp/egrixcalc$ sudo passenger-config restart-app $(pwd)
+Restarting /var/www/egrixcalcapp/egrixcalc/public (production))
  - получилось - веб-страничка обновляется
 
 
 03.01.2016
 создал локальный репозиторий взяв с гита текущий
  командой
-git clone --branch=master https://github.com/sergeimoiseev/repetitor.git code
+git clone --branch=master https://github.com/sergeimoiseev/egrixcalc.git code
 
-файлы теперь в папке c:\Users\Sergei\Projects\repetitor\code\
+файлы теперь в папке c:\Users\Sergei\Projects\EgrixCalc\code\
 
 настраиваю быстрый слив на Гитхаб
 
@@ -201,7 +210,7 @@ git clone --branch=master https://github.com/sergeimoiseev/repetitor.git code
 
 по туториалу flask отредактировал app.py (старый - в app_old.py)
 и еще несколько файлов - получился примитивный блог с одним пользователем.
-отредактировал C:\Users\Sergei\Projects\repetitor\passenger_wsgi.py
+отредактировал C:\Users\Sergei\Projects\egrixcalc\passenger_wsgi.py
 работает и локально с flask и на амазоновском сервере 
 (и там локально без passenger, и там на внешнем IP c passanger)
 
