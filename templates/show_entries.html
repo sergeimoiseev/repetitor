@@ -14,7 +14,7 @@
   <ul class=entries>
   {% for entry in entries %}
     <!-- <li><h2>{{ entry.text|safe }}</h2>{{ entry.text|safe }} -->
-    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
+    <li><h2>{{ entry.title|safe }}</h2>{{ entry.text|safe }}
   {% else %}
     <li><em>Это первый запуск теста. Залогинься или нажми OK.</em>
   {% endfor %}
