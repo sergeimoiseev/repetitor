@@ -1,4 +1,4 @@
-Этот сайт-репетитор с тестами для Валеры
+ Этот сайт-репетитор с тестами для Валеры
 начинаю с копии сайта egrixcalc версии v1
 работающая копия сохранена тут:
 c:\Users\Sergei\Dropbox\Work\EgrixCalc\egrixcalc_webapp_versions\v01\egrixcalc\
